@@ -106,6 +106,101 @@ contract OwnerOnly {
 ![Screenshot 2025-05-19 143610](https://github.com/user-attachments/assets/e7075e24-31d8-49c1-8cf9-2ca06b3a3839)
 
 ## Question 4
+Write a contract where people can donate Ether and the top 3 donors are tracked
+## code
+```
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract TopDonors {
+    struct Donor {
+        address addr;
+        uint amount;
+    }
+
+    Donor[3] public topDonors;
+
+    function donate() public payable {
+        require(msg.value > 0, "Must send some Ether");
+        for (uint i = 0; i < 3; i++) {
+            if (msg.value > topDonors[i].amount) {
+                for (uint j = 2; j > i; j--) {
+                    topDonors[j] = topDonors[j - 1];
+                }
+                topDonors[i] = Donor(msg.sender, msg.value);
+                break;
+            }
+        }
+    }
+
+    function getTopDonors() public view returns (Donor[3] memory) {
+        return topDonors;
+    }
+}
+```
+![Screenshot 2025-05-19 185602](https://github.com/user-attachments/assets/705474b5-7e3e-4082-ac32-a432c0c32eb9)
+
+
+<br>
+
+## Question 5
+Implement a simple auction system where users can place bids, and the highest bidder wins.
+## Code
+```
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Auction {
+    address public highestBidder;
+    uint public highestBid;
+
+    function bid() public payable {
+        require(msg.value > highestBid, "Bid too low");
+
+        if (highestBid != 0) {
+            payable(highestBidder).transfer(highestBid); // Refund previous
+        }
+
+        highestBidder = msg.sender;
+        highestBid = msg.value;
+    }
+}
+```
+![Screenshot 2025-05-19 190154](https://github.com/user-attachments/assets/b57a6aec-3a06-4db1-b6e9-506391195961)
+
+
+<br>
+
+## Question 6
+Create a contract that splits incoming Ether between 3 fixed addresses.
+## Code
+```
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Splitter {
+    address payable public addr1;
+    address payable public addr2;
+    address payable public addr3;
+
+    constructor(address payable _a1, address payable _a2, address payable _a3) {
+        addr1 = _a1;
+        addr2 = _a2;
+        addr3 = _a3;
+    }
+
+    receive() external payable {
+        uint256 share = msg.value / 3;
+        addr1.transfer(share);
+        addr2.transfer(share);
+        addr3.transfer(msg.value - 2 * share); // Handle remainder
+    }
+}
+```
+![Screenshot 2025-05-19 190426](https://github.com/user-attachments/assets/3fcab5c9-83aa-4a70-8b3a-d173de82efbd)
+
+
 
 
 
